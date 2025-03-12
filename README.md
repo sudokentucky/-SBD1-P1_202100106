@@ -8,7 +8,7 @@ Pensado para ser **robusto, modular y escalable**, facilita el control completo 
 
 ---
 
-## 🚀 Funcionalidades Principales
+## Funcionalidades Principales
 
 - Gestión de **Usuarios** (Registro, Login, CRUD, Dirección).
 - Gestión de **Productos** (Alta, Baja, Stock, Categorías).
@@ -39,7 +39,7 @@ client/
 
 ---
 
-## ⚙️ Tecnologías
+## Tecnologías
 
 - **Python 3.12**
 - **Flask 3.1.0**
