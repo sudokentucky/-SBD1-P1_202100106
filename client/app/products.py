@@ -62,3 +62,40 @@ def list_products():
         cursor.close()
         conn.close()
 
+
+@products_bp.route('/<int:id>', methods=['GET'])
+def get_product(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+        SELECT p.id, p.name, p.description, p.price,
+            NVL(SUM(i.quantity), 0) AS stock,
+            c.name AS category
+        FROM PRODUCTO p
+        LEFT JOIN INVENTARIO i ON p.id = i.product_id
+        JOIN CATEGORIA c ON p.category_id = c.id
+        WHERE p.id = :id AND p.active = 1
+        GROUP BY p.id, p.name, p.description, p.price, c.name
+    """
+    cursor.execute(query, {'id': id})
+    row = cursor.fetchone()
+
+    if not row:
+        cursor.close()
+        conn.close()
+        return jsonify({"status": "error", "message": "Product not found"}), 404
+
+    product = {
+        "id": row[0],
+        "name": row[1],
+        "description": row[2],
+        "price": float(row[3]),
+        "stock": int(row[4]),
+        "category": row[5]
+    }
+
+    cursor.close()
+    conn.close()
+    return jsonify(product), 200
+
