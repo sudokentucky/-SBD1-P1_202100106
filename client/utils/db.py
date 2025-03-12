@@ -1,18 +1,8 @@
-
+# utils/db.py
 import cx_Oracle
 
-ORACLE_HOST = 'localhost'
-ORACLE_PORT = '1521'
-ORACLE_SERVICE = 'XEPDB1'
-ORACLE_USER = 'SYSTEM'
-ORACLE_PASSWORD = '1234E'
-
 def get_connection():
-    dsn = cx_Oracle.makedsn(ORACLE_HOST, ORACLE_PORT, serice_name = ORACLE_SERVICE)
-    connect = cx_Oracle.connect(ORACLE_USER, ORACLE_PASSWORD, dsn)
-
-    try:
-        yield connect
-    finally:
-        connect.close()
-    
+    print('Connecting to the Oracle Database...')
+    dsn_tns = cx_Oracle.makedsn('localhost', '1521', service_name='XE')
+    conn = cx_Oracle.connect(user='SYSTEM', password='1234E', dsn=dsn_tns)
+    return conn
