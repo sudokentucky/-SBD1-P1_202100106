@@ -77,6 +77,156 @@ def create_payment_method():
         cursor.close()
         conn.close()
 
+def validate_user(cursor, user_id):
+    cursor.execute("""
+        SELECT id FROM CLIENTE WHERE id = :id AND active = 1
+    """, {'id': user_id})
+    return cursor.fetchone()
+
+def validate_payment_method(cursor, payment_method_id, user_id):
+    cursor.execute("""
+        SELECT mp.id
+        FROM MetodoPago mp
+        JOIN MetodoPagoCliente mpc ON mpc.id = mp.payment_client_id
+        WHERE mp.id = :payment_method_id AND mpc.client_id = :user_id
+    """, {
+        'payment_method_id': payment_method_id,
+        'user_id': user_id
+    })
+    return cursor.fetchone()
+
+def create_order(cursor, user_id, location_id):
+    created_at = datetime.datetime.now()
+
+    cursor.execute("""
+        INSERT INTO OrdenCompra (
+            id, client_id, location_id, created_at, updated_at
+        )
+        VALUES (
+            ORDENCOMPRA_SEQ.NEXTVAL, :client_id, :location_id, :created_at, :created_at
+        )
+    """, {
+        'client_id': user_id,
+        'location_id': location_id,
+        'created_at': created_at
+    })
+
+    cursor.execute("SELECT ORDENCOMPRA_SEQ.CURRVAL FROM dual")
+    return cursor.fetchone()[0]
+
+def process_order_items(cursor, order_id, items):
+    total_amount = 0.0
+    created_at = datetime.datetime.now()
+
+    for item in items:
+        product_id = item.get('productId')
+        quantity = item.get('quantity')
+
+        # Validación básica
+        if not product_id or quantity is None:
+            raise Exception("Each item must include productId and quantity")
+
+        cursor.execute("""
+            SELECT i.id, i.quantity
+            FROM INVENTARIO i
+            WHERE i.product_id = :product_id AND i.quantity >= :required_quantity
+            ORDER BY i.quantity DESC
+            FETCH FIRST 1 ROWS ONLY
+        """, {
+            'product_id': product_id,
+            'required_quantity': quantity
+        })
+
+        inventario_row = cursor.fetchone()
+        if not inventario_row:
+            raise Exception(f"Insufficient stock for product {product_id}")
+
+        inventario_id, current_quantity = inventario_row
+
+        cursor.execute("""
+            SELECT price FROM PRODUCTO WHERE id = :product_id AND active = 1
+        """, {'product_id': product_id})
+
+        product_row = cursor.fetchone()
+        if not product_row:
+            raise Exception(f"Product {product_id} not found or inactive")
+
+        unit_price = float(product_row[0])
+        subtotal = unit_price * quantity
+        total_amount += subtotal
+
+        cursor.execute("""
+            INSERT INTO DetalleOrden (
+                id, order_id, product_id, quantity, unit_price, created_at, updated_at
+            )
+            VALUES (
+                DETALLEORDEN_SEQ.NEXTVAL, :order_id, :product_id, :quantity, :unit_price, :created_at, :created_at
+            )
+        """, {
+            'order_id': order_id,
+            'product_id': product_id,
+            'quantity': quantity,
+            'unit_price': unit_price,
+            'created_at': created_at
+        })
+
+        new_quantity = current_quantity - quantity
+        cursor.execute("""
+            UPDATE INVENTARIO
+            SET quantity = :new_quantity, updated_at = :updated_at
+            WHERE id = :inventario_id
+        """, {
+            'new_quantity': new_quantity,
+            'updated_at': created_at,
+            'inventario_id': inventario_id
+        })
+
+    return total_amount
+
+def create_payment(cursor, order_id, payment_method_id, total_amount):
+    created_at = datetime.datetime.now()
+    estado_pago_id = 0 #Inicialmente el estado del pago es 0 (pendiente)
+
+    cursor.execute("""
+        INSERT INTO Pago (
+            id, order_id, metodo_pago_id, estado_pago_id, total_amount, created_at, updated_at
+        )
+        VALUES (
+            PAGO_SEQ.NEXTVAL, :order_id, :payment_method_id, :estado_pago_id, :total_amount, :created_at, :created_at
+        )
+    """, {
+        'order_id': order_id,
+        'payment_method_id': payment_method_id,
+        'estado_pago_id': estado_pago_id,
+        'total_amount': total_amount,
+        'created_at': created_at
+    })
+
+def create_shipping(cursor, order_id, shipping_address):
+    created_at = datetime.datetime.now()
+    company_id = 1
+    shipping_status_id = 1
+    guide_number = f"G{order_id:04d}"  
+
+    cursor.execute("""
+        INSERT INTO Envio (
+            id, order_id, company_id, shipping_status_id, address, number_company_guide,
+            dispatch_date, created_at, updated_at
+        )
+        VALUES (
+            ENVIO_SEQ.NEXTVAL, :order_id, :company_id, :shipping_status_id, :address, :guide_number,
+            :dispatch_date, :created_at, :created_at
+        )
+    """, {
+        'order_id': order_id,
+        'company_id': company_id,
+        'shipping_status_id': shipping_status_id,
+        'address': shipping_address,
+        'guide_number': guide_number,
+        'dispatch_date': created_at,
+        'created_at': created_at
+    })
+
 @orders_bp.route('', methods=['POST'])
 def create_order():
     data = request.get_json()
@@ -101,38 +251,22 @@ def create_order():
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id FROM CLIENTE WHERE id = :id AND active = 1
-        """, {'id': user_id})
-        cliente_row = cursor.fetchone()
 
-        if not cliente_row:
+        if not validate_user(cursor, user_id):
             return jsonify({
                 "status": "error",
                 "message": f"User {user_id} not found or inactive"
             }), 404
-        cursor.execute("""
-            SELECT mp.id
-            FROM MetodoPago mp
-            JOIN MetodoPagoCliente mpc ON mpc.id = mp.payment_client_id
-            WHERE mp.id = :payment_method_id AND mpc.client_id = :user_id
-        """, {
-            'payment_method_id': payment_method_id,
-            'user_id': user_id
-        })
 
-        payment_method_row = cursor.fetchone()
-
-        if not payment_method_row:
+        if not validate_payment_method(cursor, payment_method_id, user_id):
             return jsonify({
                 "status": "error",
                 "message": f"Payment method {payment_method_id} not found or not associated with user {user_id}"
             }), 404
 
-        created_at = datetime.datetime.now()
         first_product_id = items[0]['productId']
         cursor.execute("""
-            SELECT s.id, s.name
+            SELECT s.id
             FROM INVENTARIO i
             JOIN SEDE s ON s.id = i.location_id
             WHERE i.product_id = :product_id
@@ -141,7 +275,6 @@ def create_order():
         """, {'product_id': first_product_id})
 
         location_row = cursor.fetchone()
-
         if not location_row:
             return jsonify({
                 "status": "error",
@@ -149,98 +282,10 @@ def create_order():
             }), 404
 
         location_id = location_row[0]
-        cursor.execute("""
-            INSERT INTO OrdenCompra (
-                id, client_id, location_id, created_at, updated_at
-            )
-            VALUES (
-                ORDENCOMPRA_SEQ.NEXTVAL, :client_id, :location_id, :created_at, :created_at
-            )
-        """, {
-            'client_id': user_id,
-            'location_id': location_id,
-            'created_at': created_at
-        })
-
-        cursor.execute("SELECT ORDENCOMPRA_SEQ.CURRVAL FROM dual")
-        order_id = cursor.fetchone()[0]
-
-        total_amount = 0.0
-        for item in items:
-            product_id = item.get('productId')
-            quantity = item.get('quantity')
-
-            if not product_id or quantity is None:
-                conn.rollback()
-                return jsonify({
-                    "status": "error",
-                    "message": "Each item must include productId and quantity"
-                }), 400
-            cursor.execute("""
-                SELECT i.id, i.quantity, s.id AS sede_id, s.name
-                FROM INVENTARIO i
-                JOIN SEDE s ON s.id = i.location_id
-                WHERE i.product_id = :product_id AND i.quantity >= :required_quantity
-                ORDER BY i.quantity DESC
-                FETCH FIRST 1 ROWS ONLY
-            """, {
-                'product_id': product_id,
-                'required_quantity': quantity
-            })
-
-            inventario_row = cursor.fetchone()
-
-            if not inventario_row:
-                conn.rollback()
-                return jsonify({
-                    "status": "error",
-                    "message": f"Insufficient stock for product {product_id}"
-                }), 400
-
-            inventario_id = inventario_row[0]
-            current_quantity = inventario_row[1]
-            cursor.execute("""
-                SELECT price FROM PRODUCTO
-                WHERE id = :product_id AND active = 1
-            """, {'product_id': product_id})
-            product_row = cursor.fetchone()
-
-            if not product_row:
-                conn.rollback()
-                return jsonify({
-                    "status": "error",
-                    "message": f"Product {product_id} not found or inactive"
-                }), 404
-
-            unit_price = float(product_row[0])
-            subtotal = unit_price * quantity
-            total_amount += subtotal
-            cursor.execute("""
-                INSERT INTO DetalleOrden (
-                    id, order_id, product_id, quantity, unit_price, created_at, updated_at
-                )
-                VALUES (
-                    DETALLEORDEN_SEQ.NEXTVAL, :order_id, :product_id, :quantity, :unit_price, :created_at, :created_at
-                )
-            """, {
-                'order_id': order_id,
-                'product_id': product_id,
-                'quantity': quantity,
-                'unit_price': unit_price,
-                'created_at': created_at
-            })
-            new_quantity = current_quantity - quantity
-
-            cursor.execute("""
-                UPDATE INVENTARIO
-                SET quantity = :new_quantity, updated_at = :updated_at
-                WHERE id = :inventario_id
-            """, {
-                'new_quantity': new_quantity,
-                'updated_at': created_at,
-                'inventario_id': inventario_id
-            })
-
+        order_id = create_order(cursor, user_id, location_id)
+        total_amount = process_order_items(cursor, order_id, items)
+        create_payment(cursor, order_id, payment_method_id, total_amount)
+        create_shipping(cursor, order_id, shipping_address)
         conn.commit()
 
         return jsonify({
@@ -261,6 +306,7 @@ def create_order():
     finally:
         cursor.close()
         conn.close()
+
 
 @orders_bp.route('', methods=['GET'])
 def list_orders():
