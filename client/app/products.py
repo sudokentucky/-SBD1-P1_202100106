@@ -203,3 +203,100 @@ def create_product():
         conn.close()
 
 
+@products_bp.route('/<int:id>', methods=['PUT'])
+def update_product(id):
+    data = request.get_json()
+
+    price = data.get('price')
+    stock = data.get('stock')
+    location = data.get('location')
+    if price is None and (stock is None or not location):
+        return jsonify({
+            "status": "error",
+            "message": "Missing fields to update: provide price and/or stock with location"
+        }), 400
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        updated_at = datetime.datetime.now()
+        if price is not None:
+            cursor.execute("""
+                UPDATE PRODUCTO
+                SET price = :price, updated_at = :updated_at
+                WHERE id = :id
+            """, {
+                'price': price,
+                'updated_at': updated_at,
+                'id': id
+            })
+
+        if stock is not None:
+            if not location:
+                return jsonify({
+                    "status": "error",
+                    "message": "Missing location for inventory update"
+                }), 400
+            cursor.execute("""
+                SELECT id FROM SEDE WHERE name = :location
+            """, {'location': location})
+            sede_row = cursor.fetchone()
+
+            if not sede_row:
+                return jsonify({
+                    "status": "error",
+                    "message": f"Location '{location}' not found"
+                }), 404
+
+            location_id = sede_row[0]
+            cursor.execute("""
+                SELECT id FROM INVENTARIO
+                WHERE product_id = :product_id AND location_id = :location_id
+            """, {
+                'product_id': id,
+                'location_id': location_id
+            })
+            inventory_row = cursor.fetchone()
+
+            if inventory_row:
+                cursor.execute("""
+                    UPDATE INVENTARIO
+                    SET quantity = :stock, updated_at = :updated_at
+                    WHERE product_id = :product_id AND location_id = :location_id
+                """, {
+                    'stock': stock,
+                    'updated_at': updated_at,
+                    'product_id': id,
+                    'location_id': location_id
+                })
+            else:
+                cursor.execute("""
+                    INSERT INTO INVENTARIO (id, quantity, product_id, location_id, created_at, updated_at)
+                    VALUES (INVENTARIO_SEQ.NEXTVAL, :quantity, :product_id, :location_id, :created_at, :updated_at)
+                """, {
+                    'quantity': stock,
+                    'product_id': id,
+                    'location_id': location_id,
+                    'created_at': updated_at,
+                    'updated_at': updated_at
+                })
+
+        conn.commit()
+
+        return jsonify({
+            "status": "success",
+            "message": "Product and/or inventory updated successfully"
+        }), 200
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
