@@ -300,3 +300,31 @@ def update_product(id):
         cursor.close()
         conn.close()
 
+@products_bp.route('/<int:id>', methods=['DELETE'])
+def delete_product(id):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE PRODUCTO SET active = 0, updated_at = :updated_at
+            WHERE id = :id
+        """, {
+            'updated_at': datetime.datetime.now(),
+            'id': id
+        })
+
+        conn.commit()
+
+        return jsonify({
+            "status": "success",
+            "message": "Product deleted successfully"
+        }), 200
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
