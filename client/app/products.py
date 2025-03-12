@@ -99,3 +99,107 @@ def get_product(id):
     conn.close()
     return jsonify(product), 200
 
+@products_bp.route('', methods=['POST'])
+def create_product():
+    data = request.get_json()
+    name = data.get('name')
+    description = data.get('description')
+    price = data.get('price')
+    stock = data.get('stock')
+    category_name = data.get('category')
+    location_name = data.get('location')
+
+    # Validación básica
+    if not all([name, price, stock, category_name, location_name]):
+        return jsonify({
+            "status": "error",
+            "message": "Missing required fields"
+        }), 400
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id FROM CATEGORIA WHERE name = :category
+        """, {'category': category_name})
+        category_row = cursor.fetchone()
+
+        if not category_row:
+            return jsonify({
+                "status": "error",
+                "message": f"Category '{category_name}' not found"
+            }), 404
+
+        category_id = category_row[0]
+
+        cursor.execute("""
+            SELECT id FROM SEDE WHERE name = :location
+        """, {'location': location_name})
+        location_row = cursor.fetchone()
+
+        if not location_row:
+            return jsonify({
+                "status": "error",
+                "message": f"Location '{location_name}' not found"
+            }), 404
+
+        location_id = location_row[0]
+
+        created_at = datetime.datetime.now()
+        sku = f"{name[:3].upper()}{str(int(datetime.datetime.timestamp(created_at)))[-5:]}"  
+        slug = name.lower().replace(' ', '-')
+
+        cursor.execute("""
+            INSERT INTO PRODUCTO (
+                id, sku, name, description, price, slug, active, category_id, created_at, updated_at
+            )
+            VALUES (
+                PRODUCTO_SEQ.NEXTVAL, :sku, :name, :description, :price, :slug, :active, :category_id, :created_at, :created_at
+            )
+        """, {
+            'sku': sku,
+            'name': name,
+            'description': description,
+            'price': price,
+            'slug': slug,
+            'active': '1',
+            'category_id': category_id,
+            'created_at': created_at
+        })
+
+        cursor.execute("SELECT PRODUCTO_SEQ.CURRVAL FROM dual")
+        product_id = cursor.fetchone()[0]
+        cursor.execute("""
+            INSERT INTO INVENTARIO (
+                id, quantity, product_id, location_id, created_at, updated_at
+            )
+            VALUES (
+                INVENTARIO_SEQ.NEXTVAL, :quantity, :product_id, :location_id, :created_at, :created_at
+            )
+        """, {
+            'quantity': stock,
+            'product_id': product_id,
+            'location_id': location_id,
+            'created_at': created_at
+        })
+
+        conn.commit()
+
+        return jsonify({
+            "status": "success",
+            "message": "Product created successfully",
+            "productId": product_id
+        }), 201
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
