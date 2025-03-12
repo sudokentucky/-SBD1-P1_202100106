@@ -21,8 +21,6 @@ Pensado para ser **robusto, modular y escalable**, facilita el control completo 
 ## Estructura del Proyecto
 
 ```
-arduino
-CopiarEditar
 client/
 ├── app/
 │   ├── __init__.py
@@ -34,7 +32,6 @@ client/
 │   ├── db.py
 │   └── .env (configuración de conexión a Oracle)
 └── run.py (archivo principal)
-
 ```
 
 ---
