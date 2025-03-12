@@ -121,7 +121,7 @@ CREATE TABLE Producto (
     description VARCHAR2(199),                             
     price       NUMBER(9)       NOT NULL,
     slug        VARCHAR2(30),                              
-    active      VARCHAR2(5)     NOT NULL,
+    active      NUMBER(1)     NOT NULL,
     category_id INTEGER         NOT NULL,                  
     created_at  TIMESTAMP       NOT NULL,
     updated_at  TIMESTAMP,                                 
@@ -129,7 +129,8 @@ CREATE TABLE Producto (
 );
 --inventario
 CREATE TABLE Inventario (
-    id          INTEGER         NOT NULL PRIMARY KEY,  
+    id          INTEGER         NOT NULL PRIMARY KEY,
+    quantity    NUMBER(6)       NOT NULL,  
     product_id  INTEGER         NOT NULL,                  
     location_id INTEGER         NOT NULL,                  
     created_at  TIMESTAMP       NOT NULL,
