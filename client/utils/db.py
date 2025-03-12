@@ -1,8 +1,16 @@
-# utils/db.py
 import cx_Oracle
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 def get_connection():
-    print('Connecting to the Oracle Database...')
-    dsn_tns = cx_Oracle.makedsn('localhost', '1521', service_name='XE')
-    conn = cx_Oracle.connect(user='SYSTEM', password='1234E', dsn=dsn_tns)
+    db_user = os.getenv('DB_USER')
+    db_password = os.getenv('DB_PASSWORD')
+    db_host = os.getenv('DB_HOST')
+    db_port = os.getenv('DB_PORT')
+    db_service = os.getenv('DB_SERVICE')
+
+    dsn_tns = cx_Oracle.makedsn(db_host, db_port, service_name=db_service)
+    conn = cx_Oracle.connect(user=db_user, password=db_password, dsn=dsn_tns)
     return conn
