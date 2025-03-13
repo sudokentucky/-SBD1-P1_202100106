@@ -227,3 +227,58 @@ def delete_user(id):
     conn.commit()
     cursor.close()
     return jsonify({"status": "success", "message": "User deleted/inactivated successfully"}), 200
+
+@users_bp.route('/payment_methods', methods=['GET'])
+def list_clients_with_payment_methods():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, name, lastname
+            FROM CLIENTE
+            WHERE active = 1
+        """)
+        clients_rows = cursor.fetchall()
+
+        clients = []
+        for client in clients_rows:
+            client_id = client[0]
+            client_name = client[1]
+            client_lastname = client[2]
+
+            cursor.execute("""
+                SELECT mp.id, mp.name
+                FROM MetodoPago mp
+                JOIN MetodoPagoCliente mpc ON mp.payment_client_id = mpc.id
+                WHERE mpc.client_id = :client_id
+            """, {'client_id': client_id})
+
+            payment_methods_rows = cursor.fetchall()
+
+            payment_methods = []
+            for pm in payment_methods_rows:
+                payment_methods.append({
+                    "paymentMethodId": pm[0],
+                    "methodName": pm[1]
+                })
+
+            clients.append({
+                "clientId": client_id,
+                "name": client_name,
+                "lastname": client_lastname,
+                "paymentMethods": payment_methods
+            })
+
+        return jsonify({
+            "clients": clients
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()
