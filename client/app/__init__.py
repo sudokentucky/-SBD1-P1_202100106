@@ -1,8 +1,8 @@
 from flask import Flask
-from .users import users_bp
-from .products import products_bp
+from .users.routes import users_bp
+from .products.routes import products_bp
 from .orders.routes import orders_bp
-from .payments import payments_bp
+from .payments.routes import payments_bp
 
 
 
