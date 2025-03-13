@@ -1,7 +1,8 @@
 from flask import Flask
 from .users import users_bp
 from .products import products_bp
-from .orders import orders_bp
+from .orders.routes import orders_bp
+
 
 
 def create_app():
