@@ -61,9 +61,6 @@ def process_order_items(cursor, order_id, items):
             'subtotal': subtotal
         })
 
-        # Debug opcional (puedes quitarlo después)
-        print(f"[OK] Added product {product_id} | Quantity: {quantity} | Unit Price: {unit_price} | Subtotal: {subtotal}")
-
     return total_amount
 
 
