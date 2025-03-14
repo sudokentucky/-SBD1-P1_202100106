@@ -164,6 +164,7 @@ CREATE TABLE DetalleOrden (
     product_id INTEGER         NOT NULL,                  
     quantity   NUMBER(5)       NOT NULL,
     unit_price NUMBER(9)       NOT NULL,
+    subtotal   NUMBER(9)       NOT NULL,
     created_at TIMESTAMP       NOT NULL,
     updated_at TIMESTAMP,                                 
     FOREIGN KEY (order_id) REFERENCES OrdenCompra(id),

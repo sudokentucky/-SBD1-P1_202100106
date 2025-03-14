@@ -67,8 +67,12 @@ def process_order_items(cursor, order_id, items):
 def create_payment(cursor, order_id, payment_method_id, total_amount):
     cursor.execute("""
         INSERT INTO Pago (id, order_id, metodo_pago_id, estado_pago_id, total_amount, created_at, updated_at)
-        VALUES (PAGO_SEQ.NEXTVAL, :order_id, :payment_method_id, 0, :total_amount, SYSDATE, SYSDATE)
-    """, {'order_id': order_id, 'payment_method_id': payment_method_id, 'total_amount': total_amount})
+        VALUES (PAGO_SEQ.NEXTVAL, :order_id, :payment_method_id, 1, :total_amount, SYSDATE, SYSDATE)
+    """, {
+        'order_id': order_id,
+        'payment_method_id': payment_method_id,
+        'total_amount': total_amount
+    })
 
 def create_shipping(cursor, order_id, shipping_address):
     cursor.execute("""
