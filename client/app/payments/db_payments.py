@@ -25,13 +25,13 @@ def get_total_order_amount(cursor, order_id):
     """, {'order_id': order_id})
     return float(cursor.fetchone()[0])
 
-def get_total_paid_amount(cursor, order_id):
+def get_status_of_payment(cursor, order_id):
     cursor.execute("""
-        SELECT NVL(SUM(total_amount), 0)
+        SELECT estado_pago_id
         FROM Pago
         WHERE order_id = :order_id
     """, {'order_id': order_id})
-    return float(cursor.fetchone()[0])
+    return cursor.fetchone()
 
 def insert_payment(cursor, order_id, payment_method_id, estado_pago_id, amount):
     created_at = datetime.datetime.now()
@@ -66,7 +66,7 @@ def get_envio_by_order_id(cursor, order_id):
 
 def update_envio(cursor, envio_id, order_id):
     created_at = datetime.datetime.now()
-    company_id = random.randint(1, 3)
+    company_id = random.randint(1, 8) #numero random, cambiar de ser necesario
     shipping_status_id = 1
     guide_number = f"G{order_id:04d}"
 
