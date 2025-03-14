@@ -42,7 +42,7 @@ CREATE TABLE Categoria (
 --tabla estado de pago
 CREATE TABLE EstadoPago (
     id         INTEGER         NOT NULL PRIMARY KEY,
-    name       VARCHAR2(7)     NOT NULL,
+    name       VARCHAR2(11)     NOT NULL,
     created_at TIMESTAMP       NOT NULL,
     updated_at TIMESTAMP
 );
@@ -204,7 +204,7 @@ CREATE TABLE Pago (
 CREATE TABLE Envio (
     id                   INTEGER         NOT NULL PRIMARY KEY,  
     order_id             INTEGER         NOT NULL,                  
-    company_id           INTEGER         NOT NULL,                  
+    company_id           INTEGER         ,                  
     shipping_status_id   INTEGER         NOT NULL,                  
     address              VARCHAR2(65)    NOT NULL,
     number_company_guide VARCHAR2(5)     NOT NULL,
