@@ -77,7 +77,7 @@ def create_payment(cursor, order_id, payment_method_id, total_amount):
 def create_shipping(cursor, order_id, shipping_address):
     cursor.execute("""
         INSERT INTO Envio (id, order_id, company_id, shipping_status_id, address, number_company_guide, dispatch_date, created_at, updated_at)
-        VALUES (ENVIO_SEQ.NEXTVAL, :order_id, 1, 1, :address, 'G'||:order_id, SYSDATE, SYSDATE, SYSDATE)
+        VALUES (ENVIO_SEQ.NEXTVAL, :order_id, NULL, 4, :address, 'G'||:order_id, SYSDATE, SYSDATE, SYSDATE)
     """, {'order_id': order_id, 'address': shipping_address})
 
 def get_orders_from_db():
