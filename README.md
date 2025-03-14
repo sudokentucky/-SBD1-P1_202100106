@@ -1,6 +1,5 @@
-# [SBD1]P1_202100106
 
-# Sistema de Gestión de Órdenes y Productos
+# [SBD1]P1_202100106
 
 Este proyecto es una **API RESTful** desarrollada en **Python (Flask)** con base de datos **Oracle**, que permite gestionar un sistema de **usuarios**, **productos**, **órdenes de compra**, **pagos**, **envíos**, y más.
 
@@ -20,7 +19,7 @@ Pensado para ser **robusto, modular y escalable**, facilita el control completo 
 
 ## Estructura del Proyecto
 
-```
+```plaintext
 /client
 └── /app
     ├── /users
@@ -42,11 +41,11 @@ Pensado para ser **robusto, modular y escalable**, facilita el control completo 
     │   └── routes.py           # Endpoints HTTP para pagos
     │
     └── __init__.py             # Función create_app() y registro de blueprints de los módulos
-		
+  
 │
 ├── utils/                # Funciones auxiliares
 │   └── db.py             # Conexión a la base de datos Oracle
-		└── .env              
+  └── .env              
 │
 ├── run.py                # Punto de entrada principal para ejecutar la app
 └── .venv/                # Entorno virtual 
@@ -79,37 +78,36 @@ Accede a los diferentes manuales del proyecto:
 ## Cómo Ejecutar el Proyecto
 
 1. Clona el repositorio:
-    
+
     ```bash
     git clone https://github.com/tuusuario/tu-repositorio.git
     ```
-    
+
 2. Activa el entorno virtual:
-    
+
     ```bash
     source .venv/bin/activate
     ```
-    
+
 3. Instala las dependencias:
-    
+
     ```bash
     pip install -r requirements.txt
     ```
-    
+
 4. Configura el archivo `.env` en `/utils`:
-    
-    ```
+
+    ```plaintext
     DB_USER=system
     DB_PASSWORD=tuPassword
     DB_DSN=localhost:1521/XEPDB1
     
     ```
-    
+
 5. Corre el servidor Flask:
-    
+
     ```bash
     python run.py
     ```
-    
 
 ---
