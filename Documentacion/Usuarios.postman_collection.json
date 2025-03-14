@@ -1,0 +1,104 @@
+{
+	"info": {
+		"_postman_id": "3cc2a22f-133f-4eb7-a22c-92882563b4e0",
+		"name": "Usuarios",
+		"description": "## Gestion de usuarios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "30632151"
+	},
+	"item": [
+		{
+			"name": "Crear Usuario",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"jdoe123\",\n    \"email\": \"jdoe@example.com\",\n    \"password\": \"securePass1\",\n    \"phone\": \"+1234567890\",\n    \"national_document\": \"A12345678\",\n    \"name\": \"John\",\n    \"lastname\": \"Doe\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/users"
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Direccion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"jdoe123\",\n    \"address\": \"123 Main Street, City, Country\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/users/add_address"
+			},
+			"response": []
+		},
+		{
+			"name": "Inicio de Sesion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"username\": \"jdoe123\",\n\"password\": \"securePass1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/users/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener Usuario",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/api/users/11"
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar phone/email",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": "http://127.0.0.1:5000/api/users/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar Usuario",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://127.0.0.1:5000/api/users/11"
+			},
+			"response": []
+		},
+		{
+			"name": "Metodos de pago",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/api/users/payment_methods"
+			},
+			"response": []
+		}
+	]
+}
