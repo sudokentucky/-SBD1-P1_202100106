@@ -11,7 +11,6 @@ def create_user_route():
         return jsonify({
             "status": "success",
             "message": "Usuario creado correctamente",
-            "user_id": user_id
         }), 201
     except ValueError as ve:
         return jsonify({"status": "error", "message": str(ve)}), 400
