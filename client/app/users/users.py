@@ -69,7 +69,7 @@ def create_user(data):
             insert_email_cliente(conn, client_id, email, created_at)
 
             conn.commit()
-            return "Dirección agregada exitosamente"
+            return "Usuario creado exitosamente"
         except Exception as e:
             conn.rollback()
             raise e
