@@ -5,54 +5,107 @@ from .db_users import *
 
 def create_user(data):
     required_fields = ['username', 'email', 'password', 'national_document', 'name', 'lastname']
-    if not all(field in data for field in required_fields):
-        raise ValueError("Faltan campos requeridos")
 
-    username = data.get('username')
-    email = data.get('email')
-    password = data.get('password')
-    phone = data.get('phone')
-    national_document = data.get('national_document')
-    name = data.get('name')
-    lastname = data.get('lastname')
+    if isinstance(data, list):
+        conn = get_connection()
+        created_ids = []
+        try:
+            for user in data:
+                if not all(field in user for field in required_fields):
+                    raise ValueError("Faltan campos requeridos en uno de los usuarios")
+                
+                username = user.get('username')
+                email = user.get('email')
+                password = user.get('password')
+                phone = user.get('phone')
+                national_document = user.get('national_document')
+                name = user.get('name')
+                lastname = user.get('lastname')
 
-    if len(password) < 6:
-        raise ValueError("La contraseña debe tener al menos 6 caracteres")
+                if len(password) < 6:
+                    raise ValueError("La contraseña debe tener al menos 6 caracteres para el usuario: " + username)
 
-    conn = get_connection()
-    try:
-        if is_username_taken(conn, username) or is_email_taken(conn, email):
-            raise ValueError("El username o email ya existen")
+                if is_username_taken(conn, username) or is_email_taken(conn, email):
+                    raise ValueError("El username o email ya existen para el usuario: " + username)
 
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        created_at = datetime.datetime.now()
+                hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                created_at = datetime.datetime.now()
 
-        client_id = insert_cliente(conn, national_document, name, lastname, username, phone, hashed_password, created_at)
-        insert_email_cliente(conn, client_id, email, created_at)
+                client_id = insert_cliente(conn, national_document, name, lastname, username, phone, hashed_password, created_at)
+                insert_email_cliente(conn, client_id, email, created_at)
+                created_ids.append(client_id)
+            
+            conn.commit()
+            return created_ids
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+    else:
+        conn = get_connection()
+        try:
+            if not all(field in data for field in required_fields):
+                raise ValueError("Faltan campos requeridos")
 
-        conn.commit()
-        return client_id
-    except Exception as e:
-        conn.rollback()
-        raise e
-    finally:
-        conn.close()
+            username = data.get('username')
+            email = data.get('email')
+            password = data.get('password')
+            phone = data.get('phone')
+            national_document = data.get('national_document')
+            name = data.get('name')
+            lastname = data.get('lastname')
+
+            if len(password) < 6:
+                raise ValueError("La contraseña debe tener al menos 6 caracteres")
+
+            if is_username_taken(conn, username) or is_email_taken(conn, email):
+                raise ValueError("El username o email ya existen")
+
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            created_at = datetime.datetime.now()
+
+            client_id = insert_cliente(conn, national_document, name, lastname, username, phone, hashed_password, created_at)
+            insert_email_cliente(conn, client_id, email, created_at)
+
+            conn.commit()
+            return "Dirección agregada exitosamente"
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
 
 def add_address(data):
-    username = data.get('username')
-    address = data.get('address')
-    if not username or not address:
-        raise ValueError("Faltan el username o la dirección")
-
     conn = get_connection()
     try:
-        user = get_client_by_username(conn, username)
-        if not user:
-            raise ValueError("Usuario no encontrado o inactivo")
-        client_id = user[0]
-        created_at = datetime.datetime.now()
-        insert_address(conn, client_id, address, created_at)
-        conn.commit()
+        if isinstance(data, list):
+            for item in data:
+                username = item.get('username')
+                address = item.get('address')
+                if not username or not address:
+                    raise ValueError("Faltan el username o la dirección en uno de los elementos")
+                user = get_client_by_username(conn, username)
+                if not user:
+                    raise ValueError(f"Usuario no encontrado o inactivo para el username: {username}")
+                client_id = user[0]
+                created_at = datetime.datetime.now()
+                insert_address(conn, client_id, address, created_at)
+            conn.commit()
+            return "Direcciones agregadas exitosamente"
+        else:
+            username = data.get('username')
+            address = data.get('address')
+            if not username or not address:
+                raise ValueError("Faltan el username o la dirección")
+            user = get_client_by_username(conn, username)
+            if not user:
+                raise ValueError("Usuario no encontrado o inactivo")
+            client_id = user[0]
+            created_at = datetime.datetime.now()
+            insert_address(conn, client_id, address, created_at)
+            conn.commit()
+            return "User created successfully"
     except Exception as e:
         conn.rollback()
         raise e

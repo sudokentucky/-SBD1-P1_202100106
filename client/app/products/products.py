@@ -53,53 +53,107 @@ def get_product(product_id):
 
 def create_product(data):
     required = ['name', 'price', 'stock', 'category', 'location']
-    if not all(data.get(field) for field in required):
-        return {"status": "error", "message": "Missing required fields"}, 400
+    
+    if isinstance(data, list):
+        conn = get_connection()
+        cursor = conn.cursor()
+        product_ids = []
+        try:
+            for product in data:
+                if not all(product.get(field) for field in required):
+                    raise ValueError("Missing required fields in product: " + str(product))
+                
+                category_row = get_category_id(cursor, product['category'])
+                if not category_row:
+                    raise ValueError("Category not found for product: " + product['name'])
+                category_id = category_row[0]
+                
+                location_row = get_location_id(cursor, product['location'])
+                if not location_row:
+                    raise ValueError("Location not found for product: " + product['name'])
+                location_id = location_row[0]
+                
+                created_at = datetime.now()
+                sku = f"{product['name'][:3].upper()}{str(int(created_at.timestamp()))[-5:]}"
+                slug = product['name'].lower().replace(' ', '-')
+                
+                product_id = insert_product(
+                    cursor,
+                    sku,
+                    product['name'],
+                    product.get('description'),
+                    product['price'],
+                    slug,
+                    category_id,
+                    created_at
+                )
+                
+                insert_inventory(
+                    cursor,
+                    product_id,
+                    location_id,
+                    product['stock'],
+                    created_at
+                )
+                
+                product_ids.append(product_id)
+            
+            conn.commit()
+            return {"status": "success", "message": "Product created successfully"}, 201
+        except Exception as e:
+            conn.rollback()
+            return {"status": "error", "message": str(e)}, 500
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        if not all(data.get(field) for field in required):
+            return {"status": "error", "message": "Missing required fields"}, 400
 
-    conn = get_connection()
-    cursor = conn.cursor()
-    try:
-        category_row = get_category_id(cursor, data['category'])
-        if not category_row:
-            return {"status": "error", "message": "Category not found"}, 404
-        category_id = category_row[0]
+        conn = get_connection()
+        cursor = conn.cursor()
+        try:
+            category_row = get_category_id(cursor, data['category'])
+            if not category_row:
+                return {"status": "error", "message": "Category not found"}, 404
+            category_id = category_row[0]
 
-        location_row = get_location_id(cursor, data['location'])
-        if not location_row:
-            return {"status": "error", "message": "Location not found"}, 404
-        location_id = location_row[0]
+            location_row = get_location_id(cursor, data['location'])
+            if not location_row:
+                return {"status": "error", "message": "Location not found"}, 404
+            location_id = location_row[0]
 
-        created_at = datetime.now()
-        sku = f"{data['name'][:3].upper()}{str(int(created_at.timestamp()))[-5:]}"
-        slug = data['name'].lower().replace(' ', '-')
+            created_at = datetime.now()
+            sku = f"{data['name'][:3].upper()}{str(int(created_at.timestamp()))[-5:]}"
+            slug = data['name'].lower().replace(' ', '-')
 
-        product_id = insert_product(
-            cursor,
-            sku,
-            data['name'],
-            data.get('description'),
-            data['price'],
-            slug,
-            category_id,
-            created_at
-        )
+            product_id = insert_product(
+                cursor,
+                sku,
+                data['name'],
+                data.get('description'),
+                data['price'],
+                slug,
+                category_id,
+                created_at
+            )
 
-        insert_inventory(
-            cursor,
-            product_id,
-            location_id,
-            data['stock'],
-            created_at
-        )
+            insert_inventory(
+                cursor,
+                product_id,
+                location_id,
+                data['stock'],
+                created_at
+            )
 
-        conn.commit()
-        return {"status": "success", "message": "Product created", "productId": product_id}, 201
-    except Exception as e:
-        conn.rollback()
-        return {"status": "error", "message": str(e)}, 500
-    finally:
-        cursor.close()
-        conn.close()
+            conn.commit()
+            return {"status": "success", "message": "Product created", "productId": product_id}, 201
+        except Exception as e:
+            conn.rollback()
+            return {"status": "error", "message": str(e)}, 500
+        finally:
+            cursor.close()
+            conn.close()
 
 def update_product(product_id, data):
     price = data.get('price')
