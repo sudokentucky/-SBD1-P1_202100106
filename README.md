@@ -21,17 +21,36 @@ Pensado para ser **robusto, modular y escalable**, facilita el control completo 
 ## Estructura del Proyecto
 
 ```
-client/
-├── app/
-│   ├── __init__.py
-│   ├── users.py
-│   ├── products.py
-│   ├── orders.py
-│   └── payments.py
-├── utils/
-│   ├── db.py
-│   └── .env (configuración de conexión a Oracle)
-└── run.py (archivo principal)
+/client
+└── /app
+    ├── /users
+    │   ├── __init__.py         # Inicialización del módulo users
+    │   └── routes.py           # Endpoints HTTP para usuarios
+    │
+    ├── /products
+    │   ├── __init__.py         # Inicialización del módulo products
+    │   └── routes.py           # Endpoints HTTP para productos
+    │
+    ├── /orders
+    │   ├── __init__.py         # Inicialización del módulo orders
+    │   ├── routes.py           # Endpoints HTTP para órdenes
+    │   ├── services.py         # Lógica de negocio y validaciones para órdenes
+    │   └── db_operations.py    # Consultas SQL y manipulación de la base de datos de órdenes
+    │
+    ├── /payments
+    │   ├── __init__.py         # Inicialización del módulo payments
+    │   └── routes.py           # Endpoints HTTP para pagos
+    │
+    └── __init__.py             # Función create_app() y registro de blueprints de los módulos
+		
+│
+├── utils/                # Funciones auxiliares
+│   └── db.py             # Conexión a la base de datos Oracle
+		└── .env              
+│
+├── run.py                # Punto de entrada principal para ejecutar la app
+└── .venv/                # Entorno virtual 
+
 ```
 
 ---
@@ -53,12 +72,12 @@ Accede a los diferentes manuales del proyecto:
 
 - [Análisis de Datos](https://www.notion.so/An-lisis-Previo-19bfad1ba0758091b7b4d2c78529e5a0?pvs=4)
 - [Manual Técnico](https://www.notion.so/Manual-T-cnico-1b4fad1ba075804aa987cb79fea0e1cc?pvs=4)
-- [Manual de Usuario](??)
+- [Manual de Usuario]((https://www.notion.so/Manual-de-Usuario-1b5fad1ba07580a78603cc5652476437?pvs=4))
 
 
 ---
 
-## 📝 Cómo Ejecutar el Proyecto
+## Cómo Ejecutar el Proyecto
 
 1. Clona el repositorio:
     
