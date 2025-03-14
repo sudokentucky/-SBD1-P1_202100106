@@ -7,7 +7,7 @@ CREATE TABLE Cliente (
     username          VARCHAR2(32)    NOT NULL,
     phone             VARCHAR2(22),
     active            VARCHAR2(5)     NOT NULL,
-    password          VARCHAR2(10)    NOT NULL,
+    password          VARCHAR2(100)    NOT NULL,
     created_at        TIMESTAMP       NOT NULL,
     updated_at        TIMESTAMP
 );
