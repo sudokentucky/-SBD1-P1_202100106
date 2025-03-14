@@ -1,0 +1,74 @@
+{
+	"info": {
+		"_postman_id": "f4be0e2c-fa51-4715-8c56-52d25b7f8d0d",
+		"name": "Productos",
+		"description": "## Gestion de Productos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "30632151"
+	},
+	"item": [
+		{
+			"name": "Listar Productos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/api/products"
+			},
+			"response": []
+		},
+		{
+			"name": "Detalle Producto",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/api/products/8"
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Producto",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Monitor Gamer 27\\\"\",\n  \"description\": \"Monitor curvo de 27 pulgadas, 165Hz, 1ms de respuesta\",\n  \"price\": 350.00,\n  \"stock\": 15,\n  \"category\": \"Electrónicos\",\n  \"location\": \"Sede Central\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/products"
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar Producto",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"price\":5000.00,\n    \"stock\":25,\n    \"location\": \"Sede Norte\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/products/6"
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar Producto",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://127.0.0.1:5000/api/products/8"
+			},
+			"response": []
+		}
+	]
+}
