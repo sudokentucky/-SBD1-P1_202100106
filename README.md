@@ -73,8 +73,7 @@ Accede a los diferentes manuales del proyecto:
 - [Análisis de Datos](https://www.notion.so/An-lisis-Previo-19bfad1ba0758091b7b4d2c78529e5a0?pvs=4)
 - [Manual Técnico](https://www.notion.so/Manual-T-cnico-1b4fad1ba075804aa987cb79fea0e1cc?pvs=4)
 - [Manual de Usuario]((https://www.notion.so/Manual-de-Usuario-1b5fad1ba07580a78603cc5652476437?pvs=4))
-
-
+  
 ---
 
 ## Cómo Ejecutar el Proyecto
