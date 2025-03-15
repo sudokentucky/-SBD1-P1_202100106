@@ -1,7 +1,3 @@
--- =========================
--- CONSULTAS GENERALES
--- =========================
-
 -- Listar todos los usuarios activos
 SELECT id, username, phone, created_at
 FROM CLIENTE
@@ -34,10 +30,6 @@ LEFT JOIN INVENTARIO i ON p.id = i.product_id
 GROUP BY p.id, p.name
 HAVING SUM(NVL(i.quantity, 0)) = 0;
 
--- =========================
--- CONSULTAS SOBRE ÓRDENES
--- =========================
-
 -- Listar todas las órdenes y su cliente asociado
 SELECT o.id AS order_id, c.username, o.created_at
 FROM ORDENCOMPRA o
@@ -58,10 +50,6 @@ JOIN DETALLEORDEN do ON do.order_id = o.id
 GROUP BY c.username
 ORDER BY total_gastado DESC;
 
--- =========================
--- CONSULTAS SOBRE PAGOS
--- =========================
-
 -- Listar todos los pagos realizados
 SELECT p.id AS pago_id, o.id AS orden_id, ep.name AS estado_pago,
        p.total_amount, p.created_at
@@ -76,9 +64,6 @@ FROM PAGO p
 JOIN METODOPAGO mp ON mp.id = p.metodo_pago_id
 GROUP BY mp.name;
 
--- =========================
--- CONSULTAS SOBRE ENVÍOS
--- =========================
 
 -- Listar todos los envíos pendientes de entrega
 SELECT e.id AS envio_id, o.id AS orden_id, et.name AS empresa_transporte, es.name AS estado_envio
@@ -95,9 +80,6 @@ JOIN EMPRESATRANSPORTE et ON et.id = e.company_id
 JOIN ESTADOENVIO es ON es.id = e.shipping_status_id
 WHERE e.id = 1;
 
--- =========================
--- CONSULTAS ADMINISTRATIVAS
--- =========================
 
 -- Productos más vendidos (TOP 5)
 SELECT p.name, SUM(do.quantity) AS total_vendido
@@ -122,10 +104,6 @@ FROM CLIENTE
 GROUP BY TO_CHAR(created_at, 'YYYY-MM-DD')
 ORDER BY fecha_registro DESC;
 
-
--- ================================
--- ANÁLISIS DE CLIENTES Y COMPORTAMIENTO
--- ================================
 
 -- 1.1 Top 10 clientes con mayor número de órdenes realizadas
 SELECT
@@ -155,10 +133,6 @@ LEFT JOIN ORDENCOMPRA o ON o.client_id = c.id
 WHERE o.id IS NULL
 GROUP BY c.id, c.username
 HAVING COUNT(mpc.id) > 0;
-
--- ================================
--- PRODUCTOS Y VENTAS DETALLADAS
--- ================================
 
 -- 2.1 Productos más vendidos por categoría
 SELECT
@@ -193,9 +167,6 @@ LEFT JOIN INVENTARIO i ON p.id = i.product_id
 GROUP BY p.id, p.name
 HAVING SUM(NVL(i.quantity, 0)) = 0;
 
--- ================================
--- ÓRDENES COMPLETAS Y ENVIOS
--- ================================
 
 -- 3.1 Reporte de órdenes con detalle de envío y estado
 SELECT
@@ -226,10 +197,6 @@ JOIN CLIENTE c ON c.id = o.client_id
 LEFT JOIN ENVIO e ON e.order_id = o.id
 WHERE e.id IS NULL
 ORDER BY o.created_at DESC;
-
--- ================================
--- PAGOS Y ESTADOS DE TRANSACCIONES
--- ================================
 
 -- 4.1 Reporte completo de pagos, método y estado
 SELECT
@@ -269,9 +236,6 @@ JOIN ESTADOPAGO ep ON ep.id = p.estado_pago_id
 WHERE ep.name = 'REJECT'
 GROUP BY c.id, c.username;
 
--- ================================
--- AUDITORÍA Y USO DEL SISTEMA
--- ================================
 
 -- 5.1 Clientes registrados por mes
 SELECT
@@ -308,9 +272,6 @@ JOIN (
 GROUP BY c.username
 ORDER BY promedio_gasto DESC;
 
--- ================================
--- CONSULTAS ESPECIALIZADAS PARA API
--- ================================
 
 -- 6.1 Listado rápido de órdenes para el endpoint /api/orders (resumido)
 SELECT
