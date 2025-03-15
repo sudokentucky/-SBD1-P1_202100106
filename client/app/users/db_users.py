@@ -1,5 +1,4 @@
 
-
 def is_username_taken(conn, username):
     cursor = conn.cursor()
     try:
