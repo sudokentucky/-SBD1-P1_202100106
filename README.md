@@ -1,9 +1,20 @@
 
 # [SBD1]P1_202100106
 
-Este proyecto es una **API RESTful** desarrollada en **Python (Flask)** con base de datos **Oracle**, que permite gestionar un sistema de **usuarios**, **productos**, **órdenes de compra**, **pagos**, **envíos**, y más.
+Este proyecto implementa una **API RESTful** en **Python (Flask)** conectada a **Oracle Database**, para gestionar un sistema completo de compras: **usuarios**, **productos**, **órdenes**, **pagos**, **envíos**, y más.  
 
-Pensado para ser **robusto, modular y escalable**, facilita el control completo del ciclo de vida de una compra, desde el registro del usuario hasta el seguimiento de la orden.
+---
+
+## Tabla de Contenidos
+
+- [\[SBD1\]P1\_202100106](#sbd1p1_202100106)
+  - [Tabla de Contenidos](#tabla-de-contenidos)
+  - [Funcionalidades Principales](#funcionalidades-principales)
+  - [Estructura del Proyecto](#estructura-del-proyecto)
+  - [Tecnologías](#tecnologías)
+  - [Documentación](#documentación)
+  - [Cómo Ejecutar el Proyecto](#cómo-ejecutar-el-proyecto)
+  - [Diagrama (Generado por GitDiagram)](#diagrama-generado-por-gitdiagram)
 
 ---
 
@@ -49,6 +60,7 @@ Pensado para ser **robusto, modular y escalable**, facilita el control completo 
 │
 ├── run.py                # Punto de entrada principal para ejecutar la app
 └── .venv/                # Entorno virtual 
+
 
 ```
 
@@ -110,7 +122,7 @@ Accede a los diferentes manuales del proyecto:
     python run.py
     ```
 
-6. Diagrama (generado por gitdiagram):
+## Diagrama (Generado por GitDiagram)
 
 ```mermaid
    graph TD
