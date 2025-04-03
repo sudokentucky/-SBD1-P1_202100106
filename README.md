@@ -110,7 +110,7 @@ Accede a los diferentes manuales del proyecto:
     python run.py
     ```
 
-6. Diagrama (generado por gitdiagram):
+6. Diagrama (generado por GitDiagram):
 
 ```mermaid
 %%{ init: { "theme": "dark" } }%%
@@ -190,14 +190,15 @@ graph TD
     click PaymentsBL "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/payments/payments.py"
     click DBUtility "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/utils/db.py"
 
-    %% Styles (modo oscuro, colores llamativos)
-    classDef external fill:#f39c12,stroke:#e67e22,stroke-width:2px;
-    classDef api fill:#3498db,stroke:#2e86c1,stroke-width:2px;
-    classDef module fill:#2ecc71,stroke:#27ae60,stroke-width:2px;
-    classDef business fill:#f1c40f,stroke:#f39c12,stroke-width:2px;
-    classDef db_module fill:#9b59b6,stroke:#8e44ad,stroke-width:2px;
-    classDef util fill:#e74c3c,stroke:#c0392b,stroke-width:2px;
-    classDef database fill:#34495e,stroke:#1abc9c,stroke-width:2px,stroke-dasharray: 5,5;
+    %% Styles (modo oscuro, fondo blanco y bordes llamativos)
+    classDef external fill:#ffffff,color:#000000,stroke:#e67e22,stroke-width:2px;
+    classDef api fill:#ffffff,color:#000000,stroke:#3498db,stroke-width:2px;
+    classDef module fill:#ffffff,color:#000000,stroke:#2ecc71,stroke-width:2px;
+    classDef business fill:#ffffff,color:#000000,stroke:#f1c40f,stroke-width:2px;
+    classDef db_module fill:#ffffff,color:#000000,stroke:#9b59b6,stroke-width:2px;
+    classDef util fill:#ffffff,color:#000000,stroke:#e74c3c,stroke-width:2px;
+    classDef database fill:#ffffff,color:#000000,stroke:#1abc9c,stroke-width:2px,stroke-dasharray: 5,5;
+
 
 ```
 
