@@ -110,6 +110,8 @@ Accede a los diferentes manuales del proyecto:
     python run.py
     ```
 
+6. Diagrama (generado por gitdiagram):
+
 ```mermaid
    graph TD
     ExternalClient["External Client (HTTP)"]:::external
