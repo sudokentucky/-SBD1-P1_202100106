@@ -109,5 +109,91 @@ Accede a los diferentes manuales del proyecto:
     ```bash
     python run.py
     ```
-    
+
+   ```Mermaid
+   graph TD
+    ExternalClient["External Client (HTTP)"]:::external
+    APIServer["Flask API Server"]:::api
+
+    ExternalClient -->|"sends request"| APIServer
+
+    %% Users Module Subgraph
+    subgraph "Users Module"
+        UsersRoutes["Users Routes"]:::module
+        UsersBL["Users Business Logic"]:::business
+        UsersDB["Users DB Operations"]:::db_module
+        UsersRoutes -->|"calls"| UsersBL
+        UsersBL -->|"queries"| UsersDB
+    end
+
+    %% Products Module Subgraph
+    subgraph "Products Module"
+        ProductsRoutes["Products Routes"]:::module
+        ProductsBL["Products Business Logic"]:::business
+        ProductsDB["Products DB Operations"]:::db_module
+        ProductsRoutes -->|"calls"| ProductsBL
+        ProductsBL -->|"queries"| ProductsDB
+    end
+
+    %% Orders Module Subgraph
+    subgraph "Orders Module"
+        OrdersRoutes["Orders Routes"]:::module
+        OrdersServices["Orders Services"]:::business
+        OrdersDB["Orders DB Operations"]:::db_module
+        OrdersRoutes -->|"calls"| OrdersServices
+        OrdersServices -->|"queries"| OrdersDB
+    end
+
+    %% Payments Module Subgraph
+    subgraph "Payments Module"
+        PaymentsRoutes["Payments Routes"]:::module
+        PaymentsBL["Payments Business Logic"]:::business
+        PaymentsDB["Payments DB Operations"]:::db_module
+        PaymentsRoutes -->|"calls"| PaymentsBL
+        PaymentsBL -->|"queries"| PaymentsDB
+    end
+
+    %% Connections from API Server to Modules Routes
+    APIServer -->|"routes to"| UsersRoutes
+    APIServer -->|"routes to"| ProductsRoutes
+    APIServer -->|"routes to"| OrdersRoutes
+    APIServer -->|"routes to"| PaymentsRoutes
+
+    %% Database Utility and Oracle Database
+    DBUtility["DB Connection Utility"]:::util
+    OracleDB["Oracle Database"]:::database
+
+    %% All module DB Operations connect to DB Utility
+    UsersDB -->|"uses"| DBUtility
+    ProductsDB -->|"uses"| DBUtility
+    OrdersDB -->|"uses"| DBUtility
+    PaymentsDB -->|"uses"| DBUtility
+
+    DBUtility -->|"connects to"| OracleDB
+
+    %% Click Events
+    click APIServer "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/run.py"
+    click UsersRoutes "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/users/routes.py"
+    click UsersDB "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/users/db_users.py"
+    click UsersBL "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/users/users.py"
+    click ProductsRoutes "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/products/routes.py"
+    click ProductsDB "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/products/db_products.py"
+    click ProductsBL "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/products/products.py"
+    click OrdersRoutes "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/orders/routes.py"
+    click OrdersServices "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/orders/services.py"
+    click OrdersDB "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/orders/db_operations.py"
+    click PaymentsRoutes "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/payments/routes.py"
+    click PaymentsDB "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/payments/db_payments.py"
+    click PaymentsBL "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/app/payments/payments.py"
+    click DBUtility "https://github.com/sudokentucky/-sbd1-p1_202100106/blob/main/client/utils/db.py"
+
+    %% Styles
+    classDef external fill:#f9e79f,stroke:#d35400,stroke-width:2px;
+    classDef api fill:#aed6f1,stroke:#2471a3,stroke-width:2px;
+    classDef module fill:#d5f5e3,stroke:#27ae60,stroke-width:2px;
+    classDef business fill:#fcf3cf,stroke:#f1c40f,stroke-width:2px;
+    classDef db_module fill:#d6eaf8,stroke:#3498db,stroke-width:2px;
+    classDef util fill:#fadbd8,stroke:#e74c3c,stroke-width:2px;
+    classDef database fill:#f5b7b1,stroke:#c0392b,stroke-width:2px,stroke-dasharray: 5,5;
+   ```
 ---
