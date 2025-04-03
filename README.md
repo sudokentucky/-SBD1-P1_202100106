@@ -68,6 +68,14 @@ Este proyecto implementa una **API RESTful** en **Python (Flask)** conectada a *
 
 ## Tecnologías
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="Python" width="50" />
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/flask/flask-original.svg" alt="Flask" width="50" />
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/oracle/oracle-original.svg" alt="Oracle DB" width="50" />
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg" alt="Docker" width="50" />
+  <img src="https://cybersensor.wordpress.com/wp-content/uploads/2018/08/bcrypt-logo.jpg" alt="bcrypt" width="50" />
+</p>
+
 - **Python 3.12**
 - **Flask 3.1.0**
 - **Oracle Database 21c**
